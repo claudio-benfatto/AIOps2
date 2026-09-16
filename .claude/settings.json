@@ -1,0 +1,162 @@
+{
+  "enabledPlugins": {
+    "commit-commands@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; case \"$f\" in *.py) ruff format \"$f\" ;; *.go) gofmt -w \"$f\" ;; esac; } 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git switch *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(pytest *)",
+      "Bash(uv *)",
+      "Bash(pip *)",
+      "Bash(pip3 *)",
+
+      "Bash(go test *)",
+      "Bash(go build *)",
+      "Bash(go run *)",
+      "Bash(go fmt *)",
+      "Bash(go vet *)",
+      "Bash(gofmt *)",
+
+      "Bash(cargo check *)",
+      "Bash(cargo test *)",
+      "Bash(cargo build *)",
+      "Bash(cargo run *)",
+      "Bash(cargo fmt *)",
+      "Bash(cargo clippy *)",
+
+      "Bash(npm test *)",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(npm ci *)",
+      "Bash(npx *)",
+
+      "Bash(make *)",
+
+      "Bash(docker ps *)",
+      "Bash(docker images *)",
+      "Bash(docker build *)",
+      "Bash(docker compose config *)",
+      "Bash(docker compose build *)",
+
+      "Bash(kubectl get *)",
+      "Bash(kubectl describe *)",
+      "Bash(kubectl logs *)",
+      "Bash(kubectl explain *)",
+      "Bash(kubectl diff *)",
+      "Bash(kubectl config current-context)",
+      "Bash(kubectl config get-contexts)",
+
+      "Bash(helm list *)",
+      "Bash(helm status *)",
+      "Bash(helm get *)",
+      "Bash(helm template *)",
+      "Bash(helm lint *)",
+
+      "Bash(terraform fmt *)",
+      "Bash(terraform validate *)",
+      "Bash(terraform plan *)",
+      "Bash(terraform show *)",
+
+      "Bash(jq *)",
+      "Bash(yq *)",
+
+      "Bash(ls *)",
+      "Bash(pwd)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(wc *)",
+      "Bash(which *)",
+
+      "WebFetch"
+    ],
+
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git reset *)",
+      "Bash(git clean *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+
+      "Bash(docker run *)",
+      "Bash(docker exec *)",
+      "Bash(docker rm *)",
+      "Bash(docker rmi *)",
+      "Bash(docker compose up *)",
+      "Bash(docker compose down *)",
+
+      "Bash(kubectl apply *)",
+      "Bash(kubectl delete *)",
+      "Bash(kubectl patch *)",
+      "Bash(kubectl edit *)",
+      "Bash(kubectl exec *)",
+      "Bash(kubectl rollout *)",
+      "Bash(kubectl scale *)",
+
+      "Bash(helm install *)",
+      "Bash(helm upgrade *)",
+      "Bash(helm uninstall *)",
+
+      "Bash(terraform apply *)",
+      "Bash(terraform destroy *)",
+      "Bash(terraform import *)",
+
+      "Bash(aws *)",
+      "Bash(curl *)",
+      "Bash(wget *)"
+    ],
+
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+
+      "Read(secrets/**)",
+      "Read(**/secrets/**)",
+      "Read(credentials/**)",
+      "Read(**/credentials/**)",
+
+      "Read(~/.ssh/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.aws/credentials)",
+      "Read(~/.aws/sso/**)",
+
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(git push --force *)"
+    ]
+  }
+}
