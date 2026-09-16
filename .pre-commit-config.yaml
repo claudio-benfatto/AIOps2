@@ -1,0 +1,43 @@
+# Run `pre-commit install --hook-type pre-commit --hook-type commit-msg`
+# once after cloning (or `make setup` once that target exists) — the
+# commit-msg stage needs to be installed explicitly, pre-commit doesn't
+# wire it up by default.
+default_install_hook_types: [pre-commit, commit-msg]
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: gofmt
+        name: gofmt (services/load_gen, lab/injector)
+        language: system
+        # gofmt -l exits 0 even when it lists unformatted files, so check
+        # its output explicitly rather than its exit code.
+        entry: bash -c 'out="$(gofmt -l "$@")"; if [ -n "$out" ]; then echo "$out"; exit 1; fi' --
+        files: \.go$
+
+      - id: go-vet-load-gen
+        name: go vet (services/load_gen)
+        language: system
+        entry: bash -c 'cd services/load_gen && go vet ./...'
+        files: ^services/load_gen/.*\.go$
+        pass_filenames: false
+
+      - id: go-vet-injector
+        name: go vet (lab/injector)
+        language: system
+        entry: bash -c 'cd lab/injector && go vet ./...'
+        files: ^lab/injector/.*\.go$
+        pass_filenames: false
+
+      - id: commitlint
+        name: commitlint
+        language: system
+        entry: npx --yes commitlint --edit
+        stages: [commit-msg]
