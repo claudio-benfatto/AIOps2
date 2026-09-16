@@ -1,0 +1,50 @@
+[tool.uv.workspace]
+members = [
+    "services/common",
+    "services/llm_sim",
+    "services/agent_svc",
+    "services/search_api",
+    "services/retrieval_svc",
+    "investigator",
+    "lab",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.8.6",
+    "mypy>=1.14",
+    "pytest>=8.3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["services/*/src", "investigator/src", "lab/src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+explicit_package_bases = true
+mypy_path = [
+    "services/common/src",
+    "services/llm_sim/src",
+    "services/agent_svc/src",
+    "services/search_api/src",
+    "services/retrieval_svc/src",
+    "investigator/src",
+    "lab/src",
+]
+
+[[tool.mypy.overrides]]
+module = ["investigator.*", "lab.*"]
+strict = true
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib"
+consider_namespace_packages = true
+markers = [
+    "eval: investigator tests that run against recorded LLM fixtures (deselect with -m 'not eval')",
+]
