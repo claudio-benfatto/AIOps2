@@ -1,0 +1,38 @@
+# Claude Code
+.claude/settings.local.json
+
+# Python (uv workspace: services/*, investigator/, lab/)
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Go (services/load_gen, lab/injector)
+/services/load_gen/bin/
+/lab/injector/bin/
+*.test
+*.out
+
+# Node (commitlint via npx)
+node_modules/
+npm-debug.log*
+
+# kind / kubeconfig
+kubeconfig
+*.kubeconfig
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
