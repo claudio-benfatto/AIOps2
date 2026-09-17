@@ -158,76 +158,76 @@ Total: 57h planned + 7h buffer = 64h.
 Each milestone ends in something demoable.
 
 ### M0: Foundation (5h)
-- Repo skeleton (uv workspace, ruff, pytest, Makefile) plus two Go modules
+1. Repo skeleton (uv workspace, ruff, pytest, Makefile) plus two Go modules
   (`services/load_gen`, `lab/injector`) with `gofmt`/`go vet`/`golangci-lint`/
   `go test` wired into `make lint`/`test`/`typecheck`
-- kind cluster + otel-lgtm deployed via Kustomize
-- `topology.yaml`: static operational graph (components, edges, ids)
-- ADRs for decisions 1–6, 8 and 9 above
+2. kind cluster + otel-lgtm deployed via Kustomize
+3. `topology.yaml`: static operational graph (components, edges, ids)
+4. ADRs for decisions 1–6, 8 and 9 above
 
 **Deliverable:** `make up` gives a running cluster with Grafana reachable.
 
 ### M1: Observable target system (13h)
-- `llm-sim` with the latency/KV model and vLLM-style metrics; HTTP surface
+1. `llm-sim` with the latency/KV model and vLLM-style metrics; HTTP surface
   (`/v1/chat/completions`) and metric names are OpenAI/vLLM-compatible by
   construction (see decision #1) — don't invent a custom schema
-- `agent-svc` with step loop, retries, max-steps guard
-- `search-api`, `retrieval-svc`
-- `load-gen` (Go): bounded worker pool over goroutines/channels, `context`-based
+2. `agent-svc` with step loop, retries, max-steps guard
+3. `search-api`, `retrieval-svc`
+4. `load-gen` (Go): bounded worker pool over goroutines/channels, `context`-based
   cancellation, `time.Ticker` rate limiting, OTel Go SDK for traces/metrics
-- OTel instrumentation using GenAI semantic conventions where applicable
-- Grafana dashboard: latency, TTFT, tokens, agent steps, tool calls/errors, KV usage
+5. OTel instrumentation using GenAI semantic conventions where applicable
+6. Grafana dashboard: latency, TTFT, tokens, agent steps, tool calls/errors, KV usage
 
 **Deliverable:** a dashboard screenshot and a trace showing
 agent → tools → LLM spans with token attributes.
 *This is already a publishable mini-piece ("instrumenting an AI agent").*
 
 ### M2: Incident lab (7h)
-- Fault-control endpoints + `metasre-lab inject/clear/reset` CLI (Go,
+1. Fault-control endpoints + `metasre-lab inject/clear/reset` CLI (Go,
   `lab/injector`), reading the injection-steps subset of the scenario spec
-- Scenario specs in `scenarios/*.yaml` (injection, ground truth, expected
+2. Scenario specs in `scenarios/*.yaml` (injection, ground truth, expected
   symptoms) — Python-side scenario loader (used by scoring) keeps the full spec
-- A symptom check per scenario confirming the fault is visible in telemetry
+3. A symptom check per scenario confirming the fault is visible in telemetry
 
 **Deliverable:** `make inject SCENARIO=S1` produces a visible, repeatable
 incident; scenario catalogue in docs.
 
 ### M3: Investigator v1 (16h)
-- Read-only tools: PromQL, LogQL, Tempo search/trace fetch, K8s events,
+1. Read-only tools: PromQL, LogQL, Tempo search/trace fetch, K8s events,
   rollout history, topology lookup
-- Hypothesis ledger tools: `propose`, `add_evidence`, `reject`
-- `submit_rca` with a Pydantic schema: symptom, hypotheses (accepted/rejected
+2. Hypothesis ledger tools: `propose`, `add_evidence`, `reject`
+3. `submit_rca` with a Pydantic schema: symptom, hypotheses (accepted/rejected
   with evidence), root cause (component id + category), causal chain,
   confidence, recommended remediation, self-review (critique text + score)
-- Self-critique pass before `submit_rca`: one bounded critic call reviews the
+4. Self-critique pass before `submit_rca`: one bounded critic call reviews the
   draft RCA for evidence sufficiency/consistency (no ground truth); the
   investigator may revise once, within the existing budgets (see decision #9)
-- Budgets: max tool calls, max tokens, wall-clock timeout (cover the
+5. Budgets: max tool calls, max tokens, wall-clock timeout (cover the
   critique-and-revise cycle, not a separate budget)
-- Markdown RCA renderer (includes the self-review section)
+6. Markdown RCA renderer (includes the self-review section)
 
 **Deliverable:** a correct, evidence-backed RCA for S1, committed as an example
 report, including its self-review. *Record a short demo here.*
 
 ### M4: Benchmark harness (9h)
-- Runner: reset → warm-up baseline → inject → wait → trigger investigation with
+1. Runner: reset → warm-up baseline → inject → wait → trigger investigation with
   an alert-style symptom only → score → clear
-- Deterministic scoring (component + category match; partial credit for
+2. Deterministic scoring (component + category match; partial credit for
   component only) and false-positive check on S0
-- Metrics per run: correctness, time to RCA, tool calls, hypotheses,
+3. Metrics per run: correctness, time to RCA, tool calls, hypotheses,
   tokens, cost, stated confidence, self-review score
-- N=3 runs per scenario; results written to `results/*.jsonl` + summary table
-- Investigator instrumented with OTel (its own token cost, latency and
+4. N=3 runs per scenario; results written to `results/*.jsonl` + summary table
+5. Investigator instrumented with OTel (its own token cost, latency and
   self-review score/logs appear in Grafana: the small, cheap "meta" nod)
 
 **Deliverable:** `make bench` produces a results table across all scenarios.
 
 ### M5: Context ablation and publication (7h)
-- Ablation: metrics-only vs metrics+logs vs metrics+logs+traces vs
+1. Ablation: metrics-only vs metrics+logs vs metrics+logs+traces vs
   full (+K8s + topology). This is one of the original research questions and
   is nearly free once the harness exists.
-- README with architecture diagram, quickstart, results, limitations
-- Write-up / blog post and a 2–3 minute demo video
+2. README with architecture diagram, quickstart, results, limitations
+3. Write-up / blog post and a 2–3 minute demo video
 
 **Deliverable:** a public repo and a write-up with measured results.
 
@@ -247,10 +247,10 @@ Never cut: S1, S0, the scoring harness, the RCA schema with evidence.
 
 ## Stretch (only if the buffer is unused)
 
-- Alert-driven trigger: poll Prometheus alerts and start investigations
-- One **controlled experiment** for S2: temporarily change `llm-sim` KV/context
+1. Alert-driven trigger: poll Prometheus alerts and start investigations
+2. One **controlled experiment** for S2: temporarily change `llm-sim` KV/context
   config, measure TTFT, update confidence (a preview of original Milestone 5)
-- A red-herring scenario: a harmless rollout happening during S1
+3. A red-herring scenario: a harmless rollout happening during S1
 
 ## Later (explicitly out of scope for the 60h)
 
