@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# NOTE: this workflow is written against the repo layout and tooling
+# described in CLAUDE.md (uv workspace under services/*, investigator/, the
+# Python parts of lab/; two standalone Go modules services/load_gen and
+# lab/injector). It will not pass until the M0 scaffolding lands. Once
+# `make lint`/`make test`/`make typecheck` exist and cover both toolchains,
+# consider having these steps call the Makefile instead of the tools
+# directly, so local runs and CI can't drift apart.
+
+jobs:
+  python:
+    name: Python (ruff, mypy, pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install workspace
+        run: uv sync --all-packages --dev
+
+      - name: ruff check
+        run: uv run ruff check .
+
+      - name: ruff format --check
+        run: uv run ruff format --check .
+
+      - name: mypy
+        run: uv run mypy .
+
+      - name: pytest
+        run: uv run pytest -m "not eval"
+        env:
+          # Never give ordinary unit tests a real key — anything that needs
+          # one belongs in the llm-evals job, and should use a recorded
+          # fixture instead (see CLAUDE.md "Don't write tests that require
+          # the real LLM API").
+          ANTHROPIC_API_KEY: ""
+
+  go:
+    name: Go (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [services/load_gen, lab/injector]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ matrix.module }}/go.mod
+          cache-dependency-path: ${{ matrix.module }}/go.sum
+
+      - name: go vet
+        working-directory: ${{ matrix.module }}
+        run: go vet ./...
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: ${{ matrix.module }}
+          args: --timeout=5m
+
+      - name: go test -race
+        working-directory: ${{ matrix.module }}
+        run: go test -race ./...
+
+  llm-evals:
+    name: LLM evals (recorded fixtures)
+    runs-on: ubuntu-latest
+    needs: python
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install workspace
+        run: uv sync --all-packages --dev
+
+      - name: Run investigator evals against recorded fixtures
+        run: uv run pytest -m eval
+        env:
+          # Deliberately unset: eval fixtures are recorded responses, not
+          # live calls. If a test tries to reach the real API without a
+          # key, it fails loudly instead of silently spending budget.
+          ANTHROPIC_API_KEY: ""
