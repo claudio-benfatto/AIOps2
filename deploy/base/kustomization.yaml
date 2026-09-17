@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: aiops2
+resources:
+  - namespace.yaml
+  - otel-lgtm
+# M1+: add each target-system service's base directory here as it lands
+# (e.g. agent-svc, llm-sim, retrieval-svc, search-api), each with its own
+# public/scraped Service port and a separate, non-scraped fault-control
+# port on that same Deployment (per CLAUDE.md invariant 1) — this base
+# structure doesn't need rework to accommodate that.
