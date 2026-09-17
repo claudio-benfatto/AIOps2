@@ -19,10 +19,10 @@ cause and cites evidence.* The scope, milestones and hour budget are in
 ## Current status
 
 <!-- Update this block at the end of every working session. -->
-- Current milestone: M0
-- Done: —
-- Next: —
-- Hours spent so far: 0 / 64
+- Current milestone: M1
+- Done: M0 — repo skeleton (uv workspace, Go modules, Makefile lint/test/typecheck), kind cluster + otel-lgtm via Kustomize, `topology.yaml`, ADRs for scoping decisions 1–6, 8, 9 (`docs/adr/0001`–`0008`)
+- Next: M1 — `llm-sim` latency/KV model, `agent-svc`, `search-api`/`retrieval-svc`, `load-gen`, OTel instrumentation, Grafana dashboard
+- Hours spent so far: 5 / 64
 
 ## Architecture
 

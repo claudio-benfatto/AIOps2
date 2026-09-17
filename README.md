@@ -14,6 +14,12 @@ and operational APIs, the investigator identifies the root cause and cites
 evidence.* See [`docs/PLAN.md`](docs/PLAN.md) for the full scope, milestones
 and hour budget.
 
+## Status
+
+M0 (foundation) is done: kind cluster + otel-lgtm, the static operational
+graph, and the scoping decisions behind them recorded as ADRs in
+[`docs/adr/`](docs/adr/). Currently on M1 (observable target system).
+
 ## Prerequisites
 
 `make up` needs a local container runtime plus `kind` and `kubectl`:
