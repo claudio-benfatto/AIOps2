@@ -1,0 +1,49 @@
+# Static operational graph of the target system.
+#
+# Component ids here MUST match the `service.name` each service emits in its
+# OpenTelemetry traces/metrics/logs (see CLAUDE.md conventions) — scoring
+# and the investigator's topology-lookup tool (M3) both key off this id
+# space. Edges are directed: `from` calls/depends on `to`.
+#
+# Scope: only the target system being diagnosed. Observability
+# infrastructure (otel-lgtm), the investigator, and the lab tooling
+# (injector, bench) are deliberately excluded — they are not components a
+# root-cause analysis can point to.
+
+components:
+  - id: load-gen
+    description: >-
+      Traffic generator driving synthetic load against agent-svc.
+    language: go
+
+  - id: agent-svc
+    description: >-
+      Target agent: step loop, tool calls, retries. Calls llm-sim for
+      inference decisions and retrieval-svc/search-api as tools.
+    language: python
+
+  - id: llm-sim
+    description: >-
+      GPU-free inference simulator (queueing, prefill, decode, finite
+      KV-cache budget) exposing vLLM-style metrics.
+    language: python
+
+  - id: retrieval-svc
+    description: >-
+      Vector retrieval tool used by agent-svc.
+    language: python
+
+  - id: search-api
+    description: >-
+      Fake external search dependency used by agent-svc.
+    language: python
+
+edges:
+  - from: load-gen
+    to: agent-svc
+  - from: agent-svc
+    to: llm-sim
+  - from: agent-svc
+    to: retrieval-svc
+  - from: agent-svc
+    to: search-api
