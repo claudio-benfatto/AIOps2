@@ -176,5 +176,6 @@ documenting a long ad-hoc command.
   declaring a task done.
 - When a milestone deliverable is reached, update the status block above and
   note the hours spent.
+- When a milestone deliverable is reached, update the README.md file with the relevant information. Keep this minimal though. Add any additional documentation to a specific /docs folder and link it from the README.md main file.
 - If a task looks likely to exceed its milestone's hour budget, say so early
   and propose what to cut, using the cut lines in `docs/PLAN.md`.

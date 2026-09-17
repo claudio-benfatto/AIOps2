@@ -14,6 +14,16 @@ and operational APIs, the investigator identifies the root cause and cites
 evidence.* See [`docs/PLAN.md`](docs/PLAN.md) for the full scope, milestones
 and hour budget.
 
+## Prerequisites
+
+`make up` needs a local container runtime plus `kind` and `kubectl`:
+
+- A running container runtime: [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/)
+  or `brew install colima docker && colima start`.
+- `brew install kind kubectl`
+
+`make up` checks for these and fails with an install hint if any are missing.
+
 ## Structure
 
 ```

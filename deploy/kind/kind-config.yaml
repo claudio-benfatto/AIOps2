@@ -1,0 +1,15 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: aiops2
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.34.11@sha256:44e222ee2132dab25ff87301682f89eb82c7880ea3a1bf543bfe9708fd08d67d
+    extraPortMappings:
+      # Grafana UI, backed by the otel-lgtm NodePort Service (deploy/base/otel-lgtm/service.yaml).
+      - containerPort: 30300
+        hostPort: 3000
+        protocol: TCP
+      # M1+: add entries here as target-system services need direct host
+      # access (e.g. a debug port). OTLP ingestion (4317/4318) does NOT need
+      # a host mapping — in-cluster services reach otel-lgtm via its
+      # ClusterIP/DNS name, not through the host.
